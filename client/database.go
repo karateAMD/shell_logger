@@ -9,16 +9,6 @@ import (
 
 var db *bolt.DB
 
-// PLEASE DELETE
-func GetFirstCommand(str string) string {
-	for i := 0; i < len(str); i++ {
-		if str[i] == ' ' {
-			return str[:i]
-		}
-	}
-	return str
-}
-
 // TODO: needs to be called anytime shell logger starts running
 // Creates the database if it doesn't exist, otherwise opens the database and creates a bucket for key:value pairs
 func SetupDatabase() error {
@@ -74,7 +64,7 @@ func GetGoodCommands(key []byte) ([][]byte, error) {
 
 // Inserts the key:value pair of correctCommand:incorrectCommand into the database
 func Insert(correct []byte, incorrect []byte) error {
-	firstWord := []byte(GetFirstCommand(string(correct)))
+	firstWord := GetFirstCommand(correct)
 	correctCommands, err := GetGoodCommands(firstWord)
 	if err != nil {
 		return err
@@ -123,28 +113,4 @@ func Insert(correct []byte, incorrect []byte) error {
 		return err
 	}
 	
-}
-
-// DELETE
-func main() {
-	SetupDatabase()
-	corr := []byte("git push origin master")
-	incorr := []byte("git push origin mast")
-	incorr2 := []byte("git pus origin master")
-	secondCorr := []byte("fc -ln -l")
-	secondIncorr := []byte("fd -ln -l")
-	newCorr := []byte("git commit -m")
-	newIncorr := []byte("git comit -m")
-	Insert(corr, incorr)
-	Insert(secondCorr, secondIncorr)
-	Insert(corr, incorr2)
-	Insert(newCorr, newIncorr)
-	str1, _ := GetGoodCommands([]byte("git"))
-	str2, _ := GetGoodCommands([]byte("fc"))
-	for i := 0; i < len(str1); i++ {
-		fmt.Println(string(str1[i]))
-	}
-	for i := 0; i < len(str2); i++ {
-		fmt.Println(string(str2[i]))
-	}
 }
